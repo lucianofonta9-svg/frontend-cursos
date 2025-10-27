@@ -1,8 +1,5 @@
-import { useState, useEffect } from 'react';
-import apiClient from '../apiService';
+// Quita useState y useEffect de aquí
 import { type IProfesor } from '../types/profesor.types.ts';
-
-// Importaciones de MUI
 import { 
   Typography, 
   Table, 
@@ -12,30 +9,21 @@ import {
   TableHead, 
   TableRow, 
   Paper,
-  CircularProgress, // Para el indicador de carga
-  Alert // Para mostrar errores
+  CircularProgress,
+  Alert 
 } from '@mui/material';
 
-export function ListaProfesores() {
-  const [profesores, setProfesores] = useState<IProfesor[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); 
-  const [error, setError] = useState<string | null>(null);
+// 1. Definimos las props que recibe el componente
+interface ListaProfesoresProps {
+  profesores: IProfesor[];
+  loading: boolean;
+  error: string | null;
+}
 
-  useEffect(() => {
-    const fetchProfesores = async () => {
-      try {
-        setLoading(true); 
-        const response = await apiClient.get<IProfesor[]>('/profesores');
-        setProfesores(response.data);
-        setError(null);
-      } catch (err) {
-        setError('No se pudieron cargar los profesores.');
-      } finally {
-        setLoading(false); 
-      }
-    };
-    fetchProfesores();
-  }, []);
+// 2. Recibimos las props
+export function ListaProfesores({ profesores, loading, error }: ListaProfesoresProps) {
+
+  // La lógica de fetch ya no está aquí
 
   if (loading) {
     return <CircularProgress />;
