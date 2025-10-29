@@ -2,12 +2,10 @@ import { useState, useEffect } from 'react';
 import apiClient from '../apiService';
 import axios from 'axios';
 import { type ICreateCursoDto } from '../types/curso.types';
-import { type IProfesor } from '../types/profesor.types'; // Necesario para el Select
-
+import { type IProfesor } from '../types/profesor.types'; 
 import {
   Box, TextField, Button, Typography, Alert, Paper,
   FormControl, InputLabel, Select, MenuItem, 
-  // CORRECCIÓN: Importa SelectChangeEvent como 'type'
   type SelectChangeEvent, 
   CircularProgress
 } from '@mui/material';
@@ -20,13 +18,16 @@ const initialState: ICreateCursoDto = {
   profesorLegajo: 0,
 };
 
+// 1. Añadida la prop onRequestClose
 interface FormularioCursoProps {
   onCursoCreado: () => void;
+  onRequestClose?: () => void; // Prop para cerrar el modal
 }
 
-export function FormularioCurso({ onCursoCreado }: FormularioCursoProps) {
+// 2. Recibe la prop onRequestClose
+export function FormularioCurso({ onCursoCreado, onRequestClose }: FormularioCursoProps) {
   const [formData, setFormData] = useState<ICreateCursoDto>(initialState);
-  const [profesores, setProfesores] = useState<IProfesor[]>([]); // Lista para el select
+  const [profesores, setProfesores] = useState<IProfesor[]>([]); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -46,40 +47,30 @@ export function FormularioCurso({ onCursoCreado }: FormularioCursoProps) {
     fetchProfesores();
   }, []);
 
-  // --- NUEVAS FUNCIONES DE CAMBIO SEPARADAS ---
-
-  // 1. Manejador para TextField (Input Element)
+  // Manejador para TextField
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
-    // El valor para 'duracion' debe ser numérico
     const processedValue = name === 'duracion' ? Number(value) : value;
-    
     setFormData({
       ...formData,
       [name]: processedValue,
     });
   };
 
-  // 2. Manejador para Select (SelectChangeEvent)
+  // Manejador para Select
   const handleSelectChange = (e: SelectChangeEvent<number>) => {
     const { name, value } = e.target;
-    
-    // El valor para 'profesorLegajo' siempre es numérico en el Select de este caso
     setFormData({
       ...formData,
       [name]: Number(value),
     });
   };
 
-  // ------------------------------------------
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    // Validación básica en el frontend
     if (formData.profesorLegajo === 0) {
         setError("Debe seleccionar un profesor para el curso.");
         return;
@@ -89,7 +80,12 @@ export function FormularioCurso({ onCursoCreado }: FormularioCursoProps) {
       const response = await apiClient.post('/cursos', formData);
       setSuccess(`Curso "${response.data.nombre}" (ID: ${response.data.id}) creado y asignado.`);
       setFormData(initialState); 
-      onCursoCreado(); // Avisa a App.tsx para que recargue la lista de cursos
+      onCursoCreado(); 
+
+      // 3. Llama a onRequestClose si existe (después de éxito)
+      if (onRequestClose) {
+        onRequestClose();
+      }
 
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response) {
@@ -111,13 +107,15 @@ export function FormularioCurso({ onCursoCreado }: FormularioCursoProps) {
   if (loading) return <CircularProgress sx={{ margin: 'auto', display: 'block' }} />;
 
   return (
-    <Paper elevation={3} sx={{ padding: 3, marginTop: 4 }}>
+    // Quitado el margen superior (marginTop) para que el Modal lo controle
+    <Paper elevation={3} sx={{ padding: 3 }}> 
       <Box 
         component="form" 
         onSubmit={handleSubmit}
         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       >
-        <Typography variant="h5">Añadir Nuevo Curso</Typography>
+        {/* El título se puede quitar si ya está en el Modal */}
+        {/* <Typography variant="h5">Añadir Nuevo Curso</Typography> */}
         
         <TextField
           label="Nombre del Curso"
@@ -164,15 +162,20 @@ export function FormularioCurso({ onCursoCreado }: FormularioCursoProps) {
           {profesores.length === 0 && <Typography color="error" variant="caption">No hay profesores activos.</Typography>}
         </FormControl>
 
-        <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary" 
-            sx={{ marginTop: 1 }}
-            disabled={profesores.length === 0}
-        >
-          Guardar Curso
-        </Button>
+        {/* 4. Añadido el Box para los botones */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, marginTop: 2 }}>
+            <Button variant="outlined" onClick={onRequestClose ?? (() => {})}>
+              Cancelar
+            </Button>
+            <Button 
+                type="submit" 
+                variant="contained" 
+                color="primary" 
+                disabled={profesores.length === 0}
+            >
+              Guardar Curso
+            </Button>
+        </Box>
 
         {success && <Alert severity="success" sx={{ marginTop: 2 }}>{success}</Alert>}
         {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}
@@ -180,3 +183,4 @@ export function FormularioCurso({ onCursoCreado }: FormularioCursoProps) {
     </Paper>
   );
 }
+

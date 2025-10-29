@@ -1,5 +1,4 @@
 import { useState } from 'react';
-// 1. Cambiado a tipo Alumno DTO
 import { type ICreateAlumnoDto } from '../types/alumno.types.ts'; 
 import apiClient from '../apiService';
 import axios from 'axios'; 
@@ -12,7 +11,7 @@ import {
   Paper 
 } from '@mui/material';
 
-// 2. Estado inicial ajustado para Alumno
+// Estado inicial ajustado para Alumno
 const initialState: ICreateAlumnoDto = {
   nombre: '',
   apellido: '',
@@ -20,17 +19,16 @@ const initialState: ICreateAlumnoDto = {
   email: '',
   fechaNacimiento: '', 
   telefono: '',
-  // Nota: 'especialidades' no está en Alumno
 };
 
-// 3. Renombrada la interface de props
+// 1. Añadida la prop onRequestClose
 interface FormularioAlumnoProps {
-  onAlumnoCreado: () => void; // 4. Cambiado el nombre de la prop
+  onAlumnoCreado: () => void;
+  onRequestClose?: () => void; // Prop para cerrar el modal
 }
 
-// 5. Renombrado el componente y la prop recibida
-export function FormularioAlumno({ onAlumnoCreado }: FormularioAlumnoProps) {
-  // 6. Cambiado el tipo del estado
+// 2. Recibe la prop onRequestClose
+export function FormularioAlumno({ onAlumnoCreado, onRequestClose }: FormularioAlumnoProps) {
   const [formData, setFormData] = useState<ICreateAlumnoDto>(initialState); 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -48,13 +46,15 @@ export function FormularioAlumno({ onAlumnoCreado }: FormularioAlumnoProps) {
     setSuccess(null);
 
     try {
-      // 7. Cambiado el endpoint a '/alumnos'
       const response = await apiClient.post('/alumnos', formData); 
-      // 8. Mensaje de éxito ajustado
       setSuccess(`Alumno "${response.data.nombre}" creado con legajo ${response.data.legajoAlumno}.`); 
       setFormData(initialState); 
-      // 9. Llama a la prop correcta
       onAlumnoCreado(); 
+
+      // 3. Llama a onRequestClose después de éxito
+      if (onRequestClose) {
+        onRequestClose();
+      }
 
     } catch (err: unknown) { 
       if (axios.isAxiosError(err) && err.response) {
@@ -62,11 +62,9 @@ export function FormularioAlumno({ onAlumnoCreado }: FormularioAlumnoProps) {
           const apiErrors = err.response.data.message as string[];
           setError(apiErrors.join(', '));
         } else {
-           // 10. Mensaje de error ajustado
           setError(`Error: ${err.response.status} ${err.response.statusText}`);
         }
       } else {
-        // 11. Mensaje de error ajustado
         setError('Error al crear el alumno. Revise la consola.'); 
       }
       console.error(err);
@@ -74,7 +72,8 @@ export function FormularioAlumno({ onAlumnoCreado }: FormularioAlumnoProps) {
   };
 
   return (
-    <Paper elevation={3} sx={{ marginTop: 4, padding: 3 }}>
+    // Ajustado el Paper para quitar el margen superior (el Modal lo controla)
+    <Paper elevation={3} sx={{ padding: 3 }}> 
       <Box 
         component="form" 
         onSubmit={handleSubmit}
@@ -84,10 +83,10 @@ export function FormularioAlumno({ onAlumnoCreado }: FormularioAlumnoProps) {
           gap: 2, 
         }}
       >
-        {/* 12. Título ajustado */}
-        <Typography variant="h5">Añadir Nuevo Alumno</Typography> 
+        {/* El título se puede quitar si ya está en el Modal */}
+        {/* <Typography variant="h5">Añadir Nuevo Alumno</Typography> */}
         
-        {/* Campos del formulario (sin especialidades) */}
+        {/* Campos del formulario */}
         <TextField label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} required fullWidth />
         <TextField label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} required fullWidth />
         <TextField label="DNI" name="dni" value={formData.dni} onChange={handleChange} required fullWidth />
@@ -95,10 +94,15 @@ export function FormularioAlumno({ onAlumnoCreado }: FormularioAlumnoProps) {
         <TextField label="Fecha de Nacimiento" name="fechaNacimiento" type="date" value={formData.fechaNacimiento} onChange={handleChange} InputLabelProps={{ shrink: true }} required fullWidth />
         <TextField label="Teléfono (Opcional)" name="telefono" value={formData.telefono || ''} onChange={handleChange} fullWidth />
         
-        {/* 13. Texto del botón ajustado */}
-        <Button type="submit" variant="contained" color="primary" sx={{ marginTop: 1 }}>
-          Guardar Alumno 
-        </Button>
+        {/* 4. Añadido el Box para los botones */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, marginTop: 2 }}>
+            <Button variant="outlined" onClick={onRequestClose ?? (() => {})}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="contained" color="primary">
+              Guardar Alumno 
+            </Button>
+        </Box>
 
         {success && <Alert severity="success" sx={{ marginTop: 2 }}>{success}</Alert>}
         {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}

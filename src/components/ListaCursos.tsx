@@ -1,27 +1,30 @@
 import { type ICurso } from '../types/curso.types.ts';
-import { 
-  Typography, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
+import {
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Paper,
   CircularProgress,
   Alert,
-  Chip // Usaremos Chip para el estado activo
+  Chip,
+  IconButton // <--- NUEVO: Para el botón de ícono
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete'; // <--- NUEVO: Ícono del tachito
 
-// 1. Definimos las props que recibe el componente
+// 1. Añadimos la función onDelete a las props
 interface ListaCursosProps {
   cursos: ICurso[];
   loading: boolean;
   error: string | null;
-  // Nota: No necesitamos una función de recarga, App.tsx ya lo maneja
+  onDelete: (id: number) => void; // Función para manejar la eliminación (usa el ID del curso)
 }
 
-export function ListaCursos({ cursos, loading, error }: ListaCursosProps) {
+// 2. Recibimos la prop onDelete
+export function ListaCursos({ cursos, loading, error, onDelete }: ListaCursosProps) {
 
   if (loading) {
     return <CircularProgress sx={{ margin: 'auto', display: 'block' }} />;
@@ -48,6 +51,7 @@ export function ListaCursos({ cursos, loading, error }: ListaCursosProps) {
               <TableCell>Duración (Hrs)</TableCell>
               <TableCell>Profesor Asignado</TableCell>
               <TableCell>Estado</TableCell>
+              <TableCell align="right">Acciones</TableCell> {/* 3. NUEVA COLUMNA */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -57,16 +61,26 @@ export function ListaCursos({ cursos, loading, error }: ListaCursosProps) {
                 <TableCell>{curso.nombre}</TableCell>
                 <TableCell>{curso.duracion}</TableCell>
                 <TableCell>
-                  {/* Muestra el nombre completo del profesor si la relación está cargada */}
-                  {curso.profesor ? 
-                    `${curso.profesor.nombre} (Legajo: ${curso.profesorLegajo})` : 
+                  {curso.profesor ?
+                    `${curso.profesor.nombre} (Legajo: ${curso.profesorLegajo})` :
                     `Legajo: ${curso.profesorLegajo}`}
                 </TableCell>
                 <TableCell>
-                  <Chip 
-                    label={curso.activo ? "Activo" : "Inactivo"} 
-                    color={curso.activo ? "success" : "error"} 
+                  <Chip
+                    label={curso.activo ? "Activo" : "Inactivo"}
+                    color={curso.activo ? "success" : "error"}
                   />
+                </TableCell>
+                {/* 4. NUEVA CELDA CON EL BOTÓN */}
+                <TableCell align="right">
+                  <IconButton
+                    aria-label="delete"
+                    color="error"
+                    onClick={() => onDelete(curso.id)} // Llama a la función onDelete con el ID del curso
+                  >
+                    <DeleteIcon /> {/* Ícono del tachito */}
+                  </IconButton>
+                  {/* Aquí podrías añadir un botón de Editar en el futuro */}
                 </TableCell>
               </TableRow>
             ))}
