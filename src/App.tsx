@@ -1,180 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate, useLocation, Link, BrowserRouter } from 'react-router-dom';
-import {
-  Container, Typography, Box, Tabs, Tab, AppBar, Toolbar,
-  Button, Modal, Paper, IconButton // Asegúrate de tener IconButton
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete'; // Asegúrate de tener DeleteIcon
+import { Container, Typography, Box, Tabs, Tab, AppBar, Toolbar } from '@mui/material';
 import apiClient from './apiService';
 
 // Componentes y Tipos
-import { ListaProfesores } from './components/ListaProfesores';
-import { FormularioProfesor } from './components/FormularioProfesor';
-import { ListaAlumnos } from './components/ListaAlumnos';
-import { FormularioAlumno } from './components/FormularioAlumno';
-import { FormularioCurso } from './components/FormularioCurso';
-import { ListaCursos } from './components/ListaCursos';
-import { FormularioInscripcion } from './components/FormularioInscripcion';
-import { ListaInscripciones } from './components/ListaInscripciones';
 import { type IProfesor } from './types/profesor.types.ts';
 import { type IAlumno } from './types/alumno.types.ts';
 import { type IInscripcion } from './types/inscripcion.types.ts';
 import { type ICurso } from './types/curso.types.ts';
 
+// Import   Views 
+import { GestionProfesoresView } from './views/GestionProfesoresView';
+import { GestionAlumnosView } from './views/GestionAlumnosView';
+import { GestionCursosView } from './views/GestionCursosView';
+import { GestionInscripcionesView } from './views/GestionInscripcionesView';
+import { DashboardView } from './views/DashboardView';
 
-// Estilo del Modal
-const modalStyle = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 600,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 1,
-};
 
-// -------------------------------------------------------------
-// I. COMPONENTES DE VISTAS (Páginas con Modal y Botón Eliminar)
-// -------------------------------------------------------------
-
-// --- VISTA: GESTIÓN DE PROFESORES ---
-const GestionProfesoresView = ({ profesores, loading, error, onProfesorCreado, onDeleteProfesor }: any) => {
-    const [open, setOpen] = useState(false);
-    const handleClose = () => setOpen(false);
-    const handleFormSubmit = () => { onProfesorCreado(); setOpen(false); };
-
-    return (
-        <Box sx={{ mt: 3, mx: 'auto', maxWidth: 1400, width: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4">Gestión de Profesores</Typography>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
-                    Crear Profesor
-                </Button>
-            </Box>
-            <ListaProfesores profesores={profesores} loading={loading} error={error} onDelete={onDeleteProfesor} />
-            <Modal open={open} onClose={handleClose}>
-                <Box sx={modalStyle}>
-                    <Typography variant="h5" component="h2" sx={{ mb: 3 }}>Crear Nuevo Profesor</Typography>
-                    <FormularioProfesor onProfesorCreado={handleFormSubmit} onRequestClose={handleClose} />
-                </Box>
-            </Modal>
-        </Box>
-    );
-};
-
-// --- VISTA: GESTIÓN DE ALUMNOS ---
-const GestionAlumnosView = ({ alumnos, loading, error, onAlumnoCreado, onDeleteAlumno }: any) => {
-    const [open, setOpen] = useState(false);
-    const handleClose = () => setOpen(false);
-    const handleFormSubmit = () => { onAlumnoCreado(); setOpen(false); };
-
-    return (
-        <Box sx={{ mt: 3, mx: 'auto', maxWidth: 1400, width: '100%' }}>
-             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4">Gestión de Alumnos</Typography>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
-                    Crear Alumno
-                </Button>
-            </Box>
-            <ListaAlumnos alumnos={alumnos} loading={loading} error={error} onDelete={onDeleteAlumno} />
-            <Modal open={open} onClose={handleClose}>
-                <Box sx={modalStyle}>
-                    <Typography variant="h5" component="h2" sx={{ mb: 3 }}>Crear Nuevo Alumno</Typography>
-                    <FormularioAlumno onAlumnoCreado={handleFormSubmit} onRequestClose={handleClose} />
-                </Box>
-            </Modal>
-        </Box>
-    );
-};
-
-// --- VISTA: GESTIÓN DE CURSOS ---
-const GestionCursosView = ({ cursos, loading, error, onCursoCreado, onDeleteCurso }: any) => {
-    const [open, setOpen] = useState(false);
-    const handleClose = () => setOpen(false);
-    const handleFormSubmit = () => { onCursoCreado(); setOpen(false); };
-
-    return (
-        <Box sx={{ mt: 3, mx: 'auto', maxWidth: 1400, width: '100%' }}>
-             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4">Gestión de Cursos</Typography>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
-                    Crear Curso
-                </Button>
-            </Box>
-            <ListaCursos cursos={cursos} loading={loading} error={error} onDelete={onDeleteCurso} />
-            <Modal open={open} onClose={handleClose}>
-                <Box sx={modalStyle}>
-                    <Typography variant="h5" component="h2" sx={{ mb: 3 }}>Crear Nuevo Curso</Typography>
-                    <FormularioCurso onCursoCreado={handleFormSubmit} onRequestClose={handleClose} />
-                </Box>
-            </Modal>
-        </Box>
-    );
-};
-
-// --- VISTA: GESTIÓN DE INSCRIPCIONES ---
-const GestionInscripcionesView = ({ inscripciones, loading, error, onInscripcionCreada, onEstadoCambiado, onDeleteInscripcion, keyInscripcionForm }: any) => { // Añadido onDeleteInscripcion
-    const [open, setOpen] = useState(false);
-    const handleClose = () => setOpen(false);
-    const handleFormSubmit = () => { onInscripcionCreada(); setOpen(false); };
-
-    return (
-        <Box sx={{ mt: 3, mx: 'auto', maxWidth: 1400, width: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h4">Gestión Central de Inscripciones</Typography>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
-                    Crear Nueva Inscripción
-                </Button>
-            </Box>
-            <ListaInscripciones
-                inscripciones={inscripciones}
-                loading={loading}
-                error={error}
-                onEstadoCambiado={onEstadoCambiado}
-                onDelete={onDeleteInscripcion} // Pasa la función de eliminar
-            />
-            <Modal open={open} onClose={handleClose}>
-                <Box sx={modalStyle}>
-                    <Typography variant="h5" component="h2" sx={{ mb: 3 }}>Crear Nueva Inscripción</Typography>
-                    <FormularioInscripcion
-                        key={keyInscripcionForm}
-                        onInscripcionCreada={handleFormSubmit}
-                        onRequestClose={handleClose}
-                    />
-                </Box>
-            </Modal>
-        </Box>
-    );
-};
-
-// --- VISTA: DASHBOARD ---
-const DashboardView = ({ inscripciones, profesores, alumnos, cursos, loadingInscripciones, errorInscripciones, onEstadoCambiado, onDeleteInscripcion }: any) => ( // Añadido onDeleteInscripcion
-    <Box sx={{ mt: 3, mx: 'auto', maxWidth: 1400, width: '100%' }}>
-        <Typography variant="h5" component="h2" gutterBottom>Panel de Control</Typography>
-        <Box sx={{ mb: 4, display: 'flex', gap: 4 }}>
-             <Paper elevation={3} sx={{ p: 2, flexGrow: 1 }}>
-                <Typography variant="h6">Profesores registrados: {profesores.length}</Typography>
-            </Paper>
-            <Paper elevation={3} sx={{ p: 2, flexGrow: 1 }}>
-                <Typography variant="h6">Cursos activos: {cursos.length}</Typography>
-            </Paper>
-            <Paper elevation={3} sx={{ p: 2, flexGrow: 1 }}>
-                <Typography variant="h6">Alumnos registrados: {alumnos.length}</Typography>
-            </Paper>
-        </Box>
-        <Typography variant="h5" component="h2" gutterBottom>Últimas Inscripciones</Typography>
-        <ListaInscripciones
-            inscripciones={inscripciones}
-            loading={loadingInscripciones}
-            error={errorInscripciones}
-            onEstadoCambiado={onEstadoCambiado}
-            onDelete={onDeleteInscripcion} // Pasa la función de eliminar
-        />
-    </Box>
-);
 
 
 // -------------------------------------------------------------
@@ -237,7 +79,7 @@ function AppLogicWrapper() {
     // --- LÓGICA DE TABS ---
     const getActiveTabIndex = (pathname: string) => { const paths = ['/', '/inscripciones', '/profesores', '/cursos', '/alumnos']; const index = paths.findIndex(p => pathname === p || pathname.startsWith(p + '/')); return index !== -1 ? index : 0;};
     const activeTabValue = getActiveTabIndex(location.pathname);
-    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => { const paths = ['/', '/inscripciones', '/profesores', '/cursos', '/alumnos']; navigate(paths[newValue]); };
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => { const paths = ['/', '/inscripciones', '/profesores', '/cursos', '/alumnos']; navigate(paths[newValue]); };
 
 
     // -------------------------------------------------------------

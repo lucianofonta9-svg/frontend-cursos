@@ -13,18 +13,20 @@ import {
   Chip,
   IconButton // <--- NUEVO: Para el botón de ícono
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete'; // <--- NUEVO: Ícono del tachito
+import DeleteIcon from '@mui/icons-material/Delete'; 
+import EditIcon from '@mui/icons-material/Edit';
 
 // 1. Añadimos la función onDelete a las props
 interface ListaCursosProps {
   cursos: ICurso[];
   loading: boolean;
   error: string | null;
-  onDelete: (id: number) => void; // Función para manejar la eliminación (usa el ID del curso)
+  onDelete: (id: number) => void; 
+  onEdit: (id: number) => void; 
 }
 
 // 2. Recibimos la prop onDelete
-export function ListaCursos({ cursos, loading, error, onDelete }: ListaCursosProps) {
+export function ListaCursos({ cursos, loading, error, onDelete, onEdit}: ListaCursosProps) {
 
   if (loading) {
     return <CircularProgress sx={{ margin: 'auto', display: 'block' }} />;
@@ -73,6 +75,13 @@ export function ListaCursos({ cursos, loading, error, onDelete }: ListaCursosPro
                 </TableCell>
                 {/* 4. NUEVA CELDA CON EL BOTÓN */}
                 <TableCell align="right">
+                  <IconButton
+                    aria-label="edit"
+                    color="primary"
+                    onClick={() => onEdit && onEdit(curso.id)} // Llama a la función onEdit si existe
+                  >
+                    <EditIcon />
+                  </IconButton>
                   <IconButton
                     aria-label="delete"
                     color="error"

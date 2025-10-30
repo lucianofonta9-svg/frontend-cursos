@@ -17,7 +17,7 @@ interface ListaInscripcionesProps {
   inscripciones: IInscripcion[];
   loading: boolean;
   error: string | null;
-  onEstadoCambiado: () => void;
+  onEstadoCambiado?: (id?: number, nuevoEstado?: string) => void;
   onDelete: (id: number) => void; // Función para manejar la eliminación
 }
 
@@ -136,12 +136,12 @@ export function ListaInscripciones({ inscripciones, loading, error, onEstadoCamb
       try {
           await apiClient.patch(`/inscripciones/${inscripcionSeleccionada.id}`, { estado: nuevoEstado });
           handleMenuClose();
-          onEstadoCambiado();
+          onEstadoCambiado?.(inscripcionSeleccionada.id, nuevoEstado);
       } catch (err) { console.error('Error al cambiar el estado:', err); }
   };
   const handleOpenModal = (inscripcion: IInscripcion) => { setInscripcionSeleccionada(inscripcion); setModalOpen(true); };
   const handleCloseModal = () => { setModalOpen(false); setInscripcionSeleccionada(null); };
-  const handleNotaRegistrada = () => { onEstadoCambiado(); };
+  const handleNotaRegistrada = () => { onEstadoCambiado?.(); };
   const handleToggleRow = (id: number) => { setOpenRowId(id === openRowId ? null : id); };
 
   // 5. Función handleDeleteClick (con confirmación)

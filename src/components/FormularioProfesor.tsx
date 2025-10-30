@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { type ICreateProfesorDto } from '../types/profesor.types.ts';
 import apiClient from '../apiService';
 import axios from 'axios';
-import { Box, TextField, Button, Typography, Alert, Paper } from '@mui/material';
+import { Box, TextField, Button, Alert, Paper } from '@mui/material';
 
 const initialState: ICreateProfesorDto = {
   nombre: '',

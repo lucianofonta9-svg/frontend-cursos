@@ -12,7 +12,9 @@ import {
   Alert,
   IconButton
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete'
+import DeleteIcon  from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 // 2. Renombrada la interface de props
 interface ListaAlumnosProps {
@@ -20,10 +22,11 @@ interface ListaAlumnosProps {
   loading: boolean;
   error: string | null;
   onDelete: (legajoAlumno: number) => void;
+  onEdit: (legajoAlumno: number) => void;
 }
 
 // 4. Renombrado el componente y las props recibidas
-export function ListaAlumnos({ alumnos, loading, error, onDelete }: ListaAlumnosProps) {
+export function ListaAlumnos({ alumnos, loading, error, onDelete, onEdit }: ListaAlumnosProps) {
 
   // La lógica de fetch ya no está aquí
 
@@ -65,14 +68,23 @@ export function ListaAlumnos({ alumnos, loading, error, onDelete }: ListaAlumnos
                 <TableCell>{alu.email}</TableCell>
                 <TableCell>{alu.dni}</TableCell>
                 <TableCell align="right">
+                  
+                  <IconButton
+                    color="primary"
+                    onClick={() => onEdit(alu.legajoAlumno)}
+                    title="Editar"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  
                   <IconButton 
                     aria-label="delete" 
                     color="error" // Color rojo para eliminar
                     onClick={() => onDelete(alu.legajoAlumno)} // Llama a la función onDelete con el legajo
                   >
-                    <DeleteIcon /> {/* Ícono del tachito */}
+                    <DeleteIcon /> 
                   </IconButton>
-                  {/* Aquí podrías añadir un botón de Editar en el futuro */}
+
                 </TableCell>
               </TableRow>
             ))}
