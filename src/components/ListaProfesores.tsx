@@ -11,24 +11,28 @@ import {
   Paper,
   CircularProgress,
   Alert,
-  IconButton // <--- NUEVO: Para el botón de ícono
+  IconButton,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete'; 
-import EditIcon from '@mui/icons-material/Edit'; 
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
-
-// 1. Añadimos la función onDelete a las props
+// ✅ Interfaz de props corregida
 interface ListaProfesoresProps {
   profesores: IProfesor[];
   loading: boolean;
   error: string | null;
-  onDelete: (legajoProfesor: number) => void; 
-  onEdit: (legajoProfesor: number) => void;
+  onDelete: (legajoProfesor: number) => void;
+  onEdit: (profesor: IProfesor) => void;
 }
 
-// 2. Recibimos la prop onDelete
-export function ListaProfesores({ profesores, loading, error, onDelete, onEdit }: ListaProfesoresProps) {
-
+// ✅ Componente funcional
+export function ListaProfesores({
+  profesores,
+  loading,
+  error,
+  onDelete,
+  onEdit,
+}: ListaProfesoresProps) {
   if (loading) {
     return <CircularProgress sx={{ margin: 'auto', display: 'block' }} />;
   }
@@ -44,7 +48,9 @@ export function ListaProfesores({ profesores, loading, error, onDelete, onEdit }
       </Typography>
 
       {profesores.length === 0 ? (
-        <Typography sx={{ padding: 2 }}>No hay profesores activos para mostrar.</Typography>
+        <Typography sx={{ padding: 2 }}>
+          No hay profesores activos para mostrar.
+        </Typography>
       ) : (
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
@@ -53,33 +59,36 @@ export function ListaProfesores({ profesores, loading, error, onDelete, onEdit }
               <TableCell>Nombre Completo</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>DNI</TableCell>
-              <TableCell align="right">Acciones</TableCell> {/* 3. NUEVA COLUMNA */}
+              <TableCell align="right">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {profesores.map((prof) => (
               <TableRow key={prof.legajoProfesor}>
                 <TableCell>{prof.legajoProfesor}</TableCell>
-                <TableCell>{prof.nombre} {prof.apellido}</TableCell>
+                <TableCell>
+                  {prof.nombre} {prof.apellido}
+                </TableCell>
                 <TableCell>{prof.email}</TableCell>
                 <TableCell>{prof.dni}</TableCell>
-                {/* 4. NUEVA CELDA CON EL BOTÓN */}
+
+                {/* 🔹 Botones de acción */}
                 <TableCell align="right">
                   <IconButton
                     aria-label="edit"
                     color="primary"
-                    onClick={() => onEdit && onEdit(prof.legajoProfesor)} // Llama a la función onEdit 
+                    onClick={() => onEdit(prof)} // 🔹 Llama al handler pasado por props
                   >
                     <EditIcon />
                   </IconButton>
+
                   <IconButton
                     aria-label="delete"
                     color="error"
-                    onClick={() => onDelete(prof.legajoProfesor)} // Llama a la función onDelete con el legajo
+                    onClick={() => onDelete(prof.legajoProfesor)}
                   >
-                    <DeleteIcon /> {/* Ícono del tachito */}
+                    <DeleteIcon />
                   </IconButton>
-                  {/* Aquí podrías añadir un botón de Editar en el futuro */}
                 </TableCell>
               </TableRow>
             ))}

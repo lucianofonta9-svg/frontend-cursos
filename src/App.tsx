@@ -57,6 +57,25 @@ function AppLogicWrapper() {
     const handleCursoCreado = () => { fetchCursos(); handleRecargarFormInscripcion(); };
     const handleInscripcionCreada = () => { fetchInscripciones(); handleRecargarFormInscripcion(); };
 
+    // --- HANDLERS DE EDICION ---
+
+    const handleEditProfesor = useCallback(async (profesor: IProfesor) => {
+        // Aquí iría la lógica para editar, por ejemplo:
+        // 1. Abrir un modal (requiere estado global o mover estado del modal aquí)
+        // 2. O navegar a una ruta de edición (ej: navigate(`/profesores/editar/${profesor.legajo}`))
+        // Por ahora, solo mostramos una alerta:
+        console.log("Editando profesor:", profesor);
+        alert(`Implementar lógica de edición para ${profesor.nombre} ${profesor.apellido}`);
+        
+        // Si la edición se hiciera en un modal y se guardara:
+        // try {
+        //     await apiClient.patch(`/profesores/${profesor.legajo}`, profesor);
+        //     fetchProfesores(); // Recargar la lista
+        // } catch (err) {
+        //     console.error('Error al editar profesor:', err);
+        // }
+    }, []);
+
     // --- HANDLERS DE ELIMINACIÓN ---
     const handleDeleteProfesor = useCallback(async (legajo: number) => { if (!window.confirm(`¿Dar de baja al profesor ${legajo}?`)) return; try { await apiClient.delete(`/profesores/${legajo}`); fetchProfesores(); } catch (err) { console.error('Error al eliminar profesor:', err); /* Añadir alerta de error */ } }, [fetchProfesores]);
     const handleDeleteAlumno = useCallback(async (legajo: number) => { if (!window.confirm(`¿Dar de baja al alumno ${legajo}?`)) return; try { await apiClient.delete(`/alumnos/${legajo}`); fetchAlumnos(); } catch (err) { console.error('Error al eliminar alumno:', err); /* Añadir alerta de error */ } }, [fetchAlumnos]);
@@ -119,6 +138,7 @@ function AppLogicWrapper() {
                     <Route path="/profesores" element={<GestionProfesoresView
                         profesores={profesores} loading={loadingProfesores} error={errorProfesores}
                         onProfesorCreado={handleProfesorCreado} onDeleteProfesor={handleDeleteProfesor}
+                        onEditProfesor={handleEditProfesor} 
                     />} />
                     <Route path="/cursos" element={<GestionCursosView
                         cursos={cursos} loading={loadingCursos} error={errorCursos}
