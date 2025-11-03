@@ -1,0 +1,179 @@
+import { useState, useEffect } from 'react';
+import apiClient from '../apiService';
+import { type IInscripcion } from '../types/inscripcion.types';
+import { type DashboardStats } from '../types/dashboard.types'; // Asume que 'dashboard.types.ts' existe
+import { 
+    Box, Typography, Paper, 
+    CircularProgress, Alert 
+} from '@mui/material'; // <-- ¡GRID YA NO SE IMPORTA AQUÍ!
+import { 
+  BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, 
+  CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
+import { ListaInscripciones } from '../components/ListaInscripciones';
+
+// --- Componente de Tarjeta KPI (Helper) ---
+interface KpiCardProps {
+  title: string;
+  value: number | string;
+}
+function KpiCard({ title, value }: KpiCardProps) {
+  return (
+    <Paper 
+      elevation={3} 
+      sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}
+    >
+      <Typography variant="h6" color="text.secondary" align="center">{title}</Typography>
+      <Typography variant="h3" component="p" sx={{ fontWeight: 'bold' }}>{value}</Typography>
+    </Paper>
+  );
+}
+
+// --- Corrección de tipo para PIE_COLORS ---
+const PIE_COLORS: { [key: string]: string } = {
+  ACTIVO: '#1976d2',
+  INSCRITO: '#9c27b0',
+  COMPLETADO: '#2e7d32',
+  RETIRADO: '#d32f2f',
+  DEFAULT: '#8884d8', 
+};
+
+// --- Props que recibe de App.tsx ---
+interface DashboardViewProps {
+  inscripciones: IInscripcion[];
+  loadingInscripciones: boolean;
+  errorInscripciones: string | null;
+  onEstadoCambiado?: (id?: number, nuevoEstado?: string) => void;
+  onDeleteInscripcion: (id: number) => void; 
+}
+
+// --- COMPONENTE PRINCIPAL ---
+export const DashboardView = ({
+  inscripciones,
+  loadingInscripciones,
+  errorInscripciones,
+  onEstadoCambiado,
+  onDeleteInscripcion, 
+}: DashboardViewProps) => {
+
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [errorStats, setErrorStats] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoadingStats(true);
+        setErrorStats(null);
+        const response = await apiClient.get<DashboardStats>('/dashboard/stats');
+        setStats(response.data);
+      } catch (err) {
+        console.error(err);
+        setErrorStats('No se pudieron cargar las estadísticas. Revise la conexión con el backend.');
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchStats();
+  }, []); 
+
+  return (
+    <Box sx={{ mt: 3, mx: 'auto', maxWidth: 1400, width: '100%' }}>
+      <Typography variant="h4" component="h2" gutterBottom sx={{ mb: 3 }}>
+        Panel de Control
+      </Typography>
+
+      {/* --- SECCIÓN DE KPIs --- */}
+      {loadingStats ? (
+        <CircularProgress sx={{ display: 'block', margin: 'auto' }} />
+      ) : errorStats ? (
+        <Alert severity="error">{errorStats}</Alert>
+      ) : stats && (
+        <>
+          {/* --- REEMPLAZO DE 'Grid container' POR 'Box con Flexbox' --- */}
+          {/* 'display="flex"' y 'flexWrap="wrap"' crean la rejilla.
+            'mx={-1.5}' y 'p={1.5}' en los hijos simulan el 'spacing={3}'
+          */}
+          <Box display="flex" flexWrap="wrap" sx={{ mb: 4, mx: -1.5 }}>
+            {/* --- REEMPLAZO DE 'Grid item' POR 'Box' --- */}
+            {/* 'width' define el tamaño en diferentes pantallas:
+              xs: 1 (100% - 1 columna)
+              sm: 1/2 (50% - 2 columnas)
+              md: 1/4 (25% - 4 columnas)
+            */}
+            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
+              <KpiCard title="Alumnos Activos" value={stats.kpis.totalAlumnosActivos} />
+            </Box>
+            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
+              <KpiCard title="Cursos Activos" value={stats.kpis.totalCursosActivos} />
+            </Box>
+            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
+              <KpiCard title="Profesores Activos" value={stats.kpis.totalProfesoresActivos} />
+            </Box>
+            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
+              <KpiCard title="Inscrip. Activas" value={stats.kpis.inscripcionesActivas} />
+            </Box>
+          </Box>
+
+          {/* --- SECCIÓN DE GRÁFICOS (también reemplazada) --- */}
+          <Box display="flex" flexWrap="wrap" sx={{ mb: 4, mx: -1.5 }}>
+            {/* Box para el gráfico de barras */}
+            <Box width={{ xs: 1, lg: 8/12 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
+              <Paper sx={{ p: 2, height: { xs: 400, md: 500 } }}>
+                <Typography variant="h6" gutterBottom align="center">Alumnos por Curso (Top 10 Activos)</Typography>
+                <ResponsiveContainer width="100%" height="90%">
+                  <BarChart data={stats.graficos.alumnosPorCurso} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" angle={-35} textAnchor="end" interval={0} fontSize="0.8rem" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Legend verticalAlign="top" />
+                    <Bar dataKey="value" fill="#1976d2" name="N° de Alumnos" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Paper>
+            </Box>
+
+            {/* Box para el gráfico de torta */}
+            <Box width={{ xs: 1, lg: 4/12 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
+              <Paper sx={{ p: 2, height: { xs: 400, md: 500 } }}>
+                <Typography variant="h6" gutterBottom align="center">Estado de Inscripciones</Typography>
+                <ResponsiveContainer width="100%" height="90%">
+                  <PieChart>
+                    <Pie 
+                      data={stats.graficos.inscripcionesPorEstado} 
+                      dataKey="value" 
+                      nameKey="name" 
+                      cx="50%" 
+                      cy="50%" 
+                      outerRadius={120} 
+                      labelLine={false}
+                      label={(entry) => `${entry.name} (${entry.value})`}
+                    >
+                      {stats.graficos.inscripcionesPorEstado.map((entry) => (
+                        <Cell key={`cell-${entry.name}`} fill={PIE_COLORS[entry.name] || PIE_COLORS.DEFAULT} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Paper>
+            </Box>
+          </Box>
+        </>
+      )}
+
+      {/* --- SECCIÓN DE INSCRIPCIONES (Sin cambios) --- */}
+      <Typography variant="h5" component="h2" gutterBottom sx={{ mt: 4 }}>
+        Últimas Inscripciones
+      </Typography>
+      <ListaInscripciones
+        inscripciones={inscripciones}
+        loading={loadingInscripciones}
+        error={errorInscripciones}
+        onEstadoCambiado={onEstadoCambiado}
+      onDeactivate={onDeleteInscripcion} // Redirige la prop
+      />
+    </Box>
+  );
+};
