@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate, useLocation, Link, BrowserRouter } from 'react-router-dom';
-import { Container, Typography, Box, Tabs, Tab, AppBar, Toolbar } from '@mui/material';
+import { 
+    Container, Typography, Box, Tabs, Tab, AppBar, Toolbar,
+    IconButton, Menu, MenuItem 
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import apiClient from './apiService';
 
 // Componentes y Tipos
@@ -35,10 +39,24 @@ function AppLogicWrapper() {
     const [loadingInscripciones, setLoadingInscripciones] = useState<boolean>(true);
     const [errorInscripciones, setErrorInscripciones] = useState<string | null>(null);
     const [keyInscripcionForm, setKeyInscripcionForm] = useState(0);
+    const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
 
     // --- HOOKS DEL ROUTER ---
     const navigate = useNavigate();
     const location = useLocation();
+
+    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorElNav(event.currentTarget);
+    };
+
+    const handleCloseNavMenu = () => {
+        setAnchorElNav(null);
+    };
+
+    const handleMenuClickAndNavigate = (path: string) => {
+        navigate(path);
+        handleCloseNavMenu();
+    };
 
     // --- FUNCIONES DE FETCH (CON LÓGICA COMPLETA) ---
     const fetchProfesores = useCallback(async () => { try { setLoadingProfesores(true); const r = await apiClient.get<IProfesor[]>('/profesores'); setProfesores(r.data); setErrorProfesores(null); } catch (err) { setErrorProfesores('Error cargando profesores.'); console.error(err); } finally { setLoadingProfesores(false); } }, []);
@@ -101,7 +119,7 @@ function AppLogicWrapper() {
         try {
             await apiClient.patch(`/alumnos/${legajo}/reactivate`);
             fetchAlumnos(); 
-            fetchInscripciones();
+            fetchInscripciones();
         } catch (err) {
             console.error('Error al reactivar alumno:', err);
         }
@@ -124,13 +142,12 @@ function AppLogicWrapper() {
         try {
             await apiClient.patch(`/cursos/${id}/reactivate`);
             fetchCursos();
-            fetchInscripciones();
+            fetchInscripciones();
         } catch (err) {
             console.error('Error al reactivar curso:', err);
         }
     }, [fetchCursos, fetchInscripciones]);
 
-    // --- CAMBIO 1: Función renombrada ---
     const handleRetirarInscripcion = useCallback(async (id: number) => {
        if (!window.confirm(`¿Retirar al alumno de esta inscripción (ID: ${id})? La inscripción cambiará su estado a "Retirado".`)) return;
         try {
@@ -155,22 +172,72 @@ function AppLogicWrapper() {
     // -------------------------------------------------------------
     return (
         <Box>
-            {/* Header */}
             <AppBar position="fixed" color="secondary" sx={{ top: 0, zIndex: 1100, width: '100%' }}>
                 <Toolbar>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Gestor De Cursos</Typography>
-                    <Tabs value={activeTabValue} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary" sx={{ marginLeft: 'auto' }}>
+                    <Typography
+                        variant="h6"
+                        component="div"
+                        sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}
+                    >
+                        Gestor De Cursos
+                    </Typography>
+
+                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                        <IconButton
+                            size="large"
+                            onClick={handleOpenNavMenu}
+                            color="inherit"
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorElNav}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            open={Boolean(anchorElNav)}
+                            onClose={handleCloseNavMenu}
+                            sx={{
+                                display: { xs: 'block', md: 'none' },
+                            }}
+                        >
+                            <MenuItem onClick={() => handleMenuClickAndNavigate('/')}><Typography textAlign="center">Inicio</Typography></MenuItem>
+                            <MenuItem onClick={() => handleMenuClickAndNavigate('/inscripciones')}><Typography textAlign="center">Inscripciones</Typography></MenuItem>
+                            <MenuItem onClick={() => handleMenuClickAndNavigate('/profesores')}><Typography textAlign="center">Profesores</Typography></MenuItem>
+                            <MenuItem onClick={() => handleMenuClickAndNavigate('/cursos')}><Typography textAlign="center">Cursos</Typography></MenuItem>
+                            <MenuItem onClick={() => handleMenuClickAndNavigate('/alumnos')}><Typography textAlign="center">Alumnos</Typography></MenuItem>
+                        </Menu>
+                    </Box>
+
+                    <Typography
+                        variant="h6"
+                        component="div"
+                        sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
+                    >
+                        Gestor De Cursos
+                    </Typography>
+
+                    <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }, marginLeft: 'auto' }}>
+                        <Tabs value={activeTabValue} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
                         <Tab label="Inicio" value={0} component={Link} to="/" />
                         <Tab label="Inscripciones" value={1} component={Link} to="/inscripciones" />
                         <Tab label="Profesores" value={2} component={Link} to="/profesores" />
                         <Tab label="Cursos" value={3} component={Link} to="/cursos" />
                         <Tab label="Alumnos" value={4} component={Link} to="/alumnos" />
-                    </Tabs>
+                        </Tabs>
+                    </Box>
+
                 </Toolbar>
             </AppBar>
-            <Toolbar /> {/* Espaciador */}
+            <Toolbar /> 
 
-            {/* Contenido Principal */}
             <Container maxWidth={false} disableGutters sx={{ p: 3 }}>
                 <Routes>
                     <Route path="/" element={<DashboardView
@@ -196,14 +263,14 @@ function AppLogicWrapper() {
                      cursos={cursos} loading={loadingCursos} error={errorCursos}
                         onCursoCreado={handleCursoCreado} 
                         onDeactivateCurso={handleDeactivateCurso}
-                        onReactivateCurso={handleReactivateCurso}
+                      onReactivateCurso={handleReactivateCurso}
                    />} />
                     
                     <Route path="/alumnos" element={<GestionAlumnosView
-                        alumnos={alumnos} loading={loadingAlumnos} error={errorAlumnos}
+                      alumnos={alumnos} loading={loadingAlumnos} error={errorAlumnos}
                         onAlumnoCreado={handleAlumnoCreado} 
-                        onDeactivateAlumno={handleDeactivateAlumno}
-                        onReactivateAlumno={handleReactivateAlumno}
+                        onDeactivateAlumno={handleDeactivateAlumno}
+                      onReactivateAlumno={handleReactivateAlumno}
                     />} />
 
                     <Route path="*" element={<Typography variant="h5" sx={{ mt: 5 }}>404 | Página no encontrada</Typography>} />
@@ -221,6 +288,5 @@ export default function App() {
         <BrowserRouter>
             <AppLogicWrapper />
         </BrowserRouter>
-    );
+   );
 }
-
