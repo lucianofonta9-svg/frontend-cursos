@@ -11,7 +11,13 @@ import {
   CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { ListaInscripciones } from '../components/ListaInscripciones';
-
+import PersonIcon from '@mui/icons-material/Person';
+import SchoolIcon from '@mui/icons-material/School';
+import PeopleIcon from '@mui/icons-material/People';
+import ArticleIcon from '@mui/icons-material/Article';
+import type { ICurso } from '../types/curso.types';
+import type { IProfesor } from '../types/profesor.types';
+import type { IAlumno } from '../types/alumno.types';
 // --- Componente de Tarjeta KPI (Helper) ---
 interface KpiCardProps {
   title: string;
@@ -43,8 +49,14 @@ interface DashboardViewProps {
   inscripciones: IInscripcion[];
   loadingInscripciones: boolean;
   errorInscripciones: string | null;
+profesores: IProfesor[]; // <-- Estaba enviándola, faltaba aquí
+    alumnos: IAlumno[];     // <-- También la estabas enviando
+    cursos: ICurso[];
+
+
   onEstadoCambiado?: (id?: number, nuevoEstado?: string) => void;
   onDeleteInscripcion: (id: number) => void; 
+  
 }
 
 // --- COMPONENTE PRINCIPAL ---
@@ -94,14 +106,10 @@ export const DashboardView = ({
           {/* 'display="flex"' y 'flexWrap="wrap"' crean la rejilla.
             'mx={-1.5}' y 'p={1.5}' en los hijos simulan el 'spacing={3}'
           */}
-          <Box display="flex" flexWrap="wrap" sx={{ mb: 4, mx: -1.5 }}>
-            {/* --- REEMPLAZO DE 'Grid item' POR 'Box' --- */}
-            {/* 'width' define el tamaño en diferentes pantallas:
-              xs: 1 (100% - 1 columna)
-              sm: 1/2 (50% - 2 columnas)
-              md: 1/4 (25% - 4 columnas)
-            */}
+          {/* <Box display="flex" flexWrap="wrap" sx={{ mb: 4, mx: -1.5 }}>
+            
             <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
+              
               <KpiCard title="Alumnos Activos" value={stats.kpis.totalAlumnosActivos} />
             </Box>
             <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
@@ -113,8 +121,68 @@ export const DashboardView = ({
             <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
               <KpiCard title="Inscrip. Activas" value={stats.kpis.inscripcionesActivas} />
             </Box>
-          </Box>
+          </Box> */}
+          <Box sx={{ mb: 4, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 2,
+            flexGrow: 1,
+            minWidth: 200,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <PersonIcon color="primary" sx={{ fontSize: 40 }} />
+          <Typography variant="h6">Profesores Activos: {stats.kpis.totalProfesoresActivos}</Typography>
+        </Paper>
 
+        <Paper
+          elevation={3}
+          sx={{
+            p: 2,
+            flexGrow: 1,
+            minWidth: 200,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <SchoolIcon color="secondary" sx={{ fontSize: 40 }} />
+          <Typography variant="h6">Cursos Activos: {stats.kpis.totalCursosActivos}</Typography>
+        </Paper>
+
+        <Paper
+          elevation={3}
+          sx={{
+            p: 2,
+            flexGrow: 1,
+            minWidth: 200,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <PeopleIcon color="error" sx={{ fontSize: 40 }} />
+          <Typography variant="h6">Alumnos Activos: {stats.kpis.totalAlumnosActivos}</Typography>
+        </Paper>
+
+        <Paper
+          elevation={3}
+          sx={{
+            p: 2,
+            flexGrow: 1,
+            minWidth: 200,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <ArticleIcon color="success" sx={{ fontSize: 40 }} />
+          <Typography variant="h6">Inscrip. Activas: {stats.kpis.inscripcionesActivas}</Typography>
+        </Paper>
+      </Box>
           {/* --- SECCIÓN DE GRÁFICOS (también reemplazada) --- */}
           <Box display="flex" flexWrap="wrap" sx={{ mb: 4, mx: -1.5 }}>
             {/* Box para el gráfico de barras */}

@@ -13,7 +13,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DeleteIcon from '@mui/icons-material/Delete'; 
 
 // --- 1. PROPS ACTUALIZADAS ---
-// (Renombramos 'onDelete' a 'onDeactivate' para claridad)
+// (Sin cambios)
 interface ListaInscripcionesProps {
   inscripciones: IInscripcion[];
   loading: boolean;
@@ -34,7 +34,7 @@ const getStatusColor = (estado: EstadoInscripcion): 'default' | 'primary' | 'suc
 };
 
 // --- 2. PROPS DE FILA ACTUALIZADAS ---
-// (Renombramos 'handleDeleteClick' a 'onDeactivateClick' para claridad)
+// (Sin cambios)
 interface InscripcionRowProps {
     insc: IInscripcion;
     handleMenuClick: (event: React.MouseEvent<HTMLButtonElement>, insc: IInscripcion) => void;
@@ -48,34 +48,76 @@ function InscripcionRow({ insc, handleMenuClick, handleOpenModal, openRowId, han
   const isRowOpen = insc.id === openRowId;
   const hasNotes = insc.notas && insc.notas.length > 0;
 
+  // --- LÓGICA DE INHABILITACIÓN ACTUALIZADA ---
+  const alumnoInactivo = !insc.alumno.activo;
+  // AÑADIDO: Asumimos que la propiedad de curso activo existe
+  const cursoInactivo = !insc.curso.activo; 
+  
+  // El botón de estado se deshabilita si el alumno O el curso están inactivos
+  const deshabilitarBotonEstado = alumnoInactivo || cursoInactivo; 
+
+  // Condición de inhabilitación para Añadir Nota (se mantiene la lógica original)
+  const deshabilitarNota = insc.estado === 'COMPLETADO' || insc.estado === 'RETIRADO';
+  
+  // Condición de inhabilitación para Retirar Inscripción (se mantiene la lógica original)
+  const puedeRetirarse = insc.estado !== 'COMPLETADO' && insc.estado !== 'RETIRADO'; 
+  // ------------------------------------------------------------------
+
   return (
     <>
       {/* Fila Principal */}
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        {/* ... (Celdas de ID, Alumno, Curso, Estado sin cambios) ... */}
         <TableCell>{insc.id}</TableCell>
-        <TableCell>{insc.alumno.nombre} {insc.alumno.apellido}</TableCell>
-        <TableCell>{insc.curso.nombre}</TableCell>
         <TableCell>
-          <Chip label={insc.estado} color={getStatusColor(insc.estado)}  size="small"
-                    variant="outlined" />
+            {insc.alumno.nombre} {insc.alumno.apellido}
+            {alumnoInactivo && <Chip label="ALUMNO INACTIVO" color="error" size="small" variant="filled" sx={{ marginLeft: 1 }} />}
+        </TableCell>
+        <TableCell>
+            {insc.curso.nombre}
+            {cursoInactivo && <Chip label="CURSO INACTIVO" color="error" size="small" variant="filled" sx={{ marginLeft: 1 }} />}
+        </TableCell>
+        <TableCell>
+          <Chip label={insc.estado} color={getStatusColor(insc.estado)}  size="small"
+                    variant="outlined" />
         </TableCell>
         <TableCell align="right">
             <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 0.5 }}>
-            {/* ... (Botones de Ver Notas, Cambiar Estado, Nota sin cambios) ... */}
                 <Button onClick={() => handleToggleRow(insc.id)} variant="outlined" size="small" startIcon={<RemoveRedEyeIcon />} disabled={!hasNotes} title="Ver/Ocultar Notas">
                     {isRowOpen ? 'Ocultar' : 'Ver'} Notas
                 </Button>
-                <Button onClick={(e) => handleMenuClick(e, insc)} variant="outlined" size="small" title="Cambiar Estado">
+
+                {/* --- CAMBIO DE ESTADO: DESHABILITADO SI ALUMNO O CURSO INACTIVO --- */}
+                <Button 
+                    onClick={(e) => handleMenuClick(e, insc)} 
+                    variant="outlined" 
+                    size="small" 
+                    title={deshabilitarBotonEstado ? "Inactivo: Alumno o Curso dados de baja" : "Cambiar Estado"}
+                    disabled={deshabilitarBotonEstado} // <-- ¡Aplica la nueva lógica combinada!
+                >
                     Cambiar Estado
                 </Button>
-                <Button onClick={() => handleOpenModal(insc)} variant="contained" size="small" color="success" disabled={insc.estado === 'COMPLETADO' || insc.estado === 'RETIRADO'} title="Registrar Nota">
+
+                {/* --- AÑADIR NOTA: Usa lógica original --- */}
+                <Button 
+                    onClick={() => handleOpenModal(insc)} 
+                    variant="contained" 
+                    size="small" 
+                    color="success" 
+                    disabled={deshabilitarNota} 
+                    title="Registrar Nota"
+                >
                     Añadir Nota
                 </Button>
                 
-                {/* --- 3. BOTÓN ELIMINAR ACTUALIZADO --- */}
-            {/* (Ahora solo llama a la prop, sin 'window.confirm') */}
-                <IconButton aria-label="delete" color="error" size="small" onClick={() => onDeactivateClick(insc.id)} title="Retirar Inscripción">
+                {/* --- BOTÓN RETIRAR: Usa lógica original --- */}
+                <IconButton 
+                    aria-label="delete" 
+                    color="error" 
+                    size="small" 
+                    onClick={() => onDeactivateClick(insc.id)} 
+                    title="Retirar Inscripción"
+                    disabled={!puedeRetirarse} 
+                >
                     <DeleteIcon fontSize="small" />
                 </IconButton>
             </Box>
@@ -86,15 +128,7 @@ function InscripcionRow({ insc, handleMenuClick, handleOpenModal, openRowId, han
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
           <Collapse in={isRowOpen} timeout="auto" unmountOnExit>
-
-
-
-
-
-
-
-
-<Box sx={{ margin: 1, padding: 2, backgroundColor: '#fafafa' }}>
+            <Box sx={{ margin: 1, padding: 2, backgroundColor: '#fafafa' }}>
                 <Typography variant="h6" gutterBottom component="div">
                   Notas Registradas
                 </Typography>
@@ -102,15 +136,15 @@ function InscripcionRow({ insc, handleMenuClick, handleOpenModal, openRowId, han
                 {hasNotes ? (
                   <Table size="small" aria-label="notas">
                     <TableHead>
-                     <TableRow>
+                     <TableRow>
                         <TableCell>ID Nota</TableCell>
                         <TableCell>Evaluación</TableCell>
                         <TableCell>Calificación</TableCell>
                         <TableCell>Fecha Registro</TableCell>
-                     </TableRow>
+                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {/* Hacemos el map sobre 'insc.notas' */}
+                    {/* Hacemos el map sobre 'insc.notas' */}
                       {insc.notas?.map((nota: INota) => (
                         <TableRow key={nota.id}>
                           <TableCell>{nota.id}</TableCell>
@@ -125,15 +159,6 @@ function InscripcionRow({ insc, handleMenuClick, handleOpenModal, openRowId, han
                   <Typography>No hay notas para mostrar.</Typography>
                 )}
               </Box>
-
-
-
-
-
-
-
-
-
             </Collapse>
         </TableCell>
       </TableRow>
@@ -144,21 +169,33 @@ function InscripcionRow({ insc, handleMenuClick, handleOpenModal, openRowId, han
 // ---------------------------------------------------------
 // Componente Principal (ListaInscripciones)
 // ---------------------------------------------------------
-// --- 4. PROPS DESTRUCTURADAS ACTUALIZADAS ---
 export function ListaInscripciones({ inscripciones, loading, error, onEstadoCambiado, onDeactivate }: ListaInscripcionesProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [inscripcionSeleccionada, setInscripcionSeleccionada] = useState<IInscripcion | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [openRowId, setOpenRowId] = useState<number | null>(null);
 
-  // --- Handlers (Sin cambios) ---
+  // --- Handlers ---
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, inscripcion: IInscripcion) => {
+    // AÑADIDO: Si el alumno O el curso están inactivos, no abrimos el menú
+      if (!inscripcion.alumno.activo || !inscripcion.curso.activo) { 
+          console.warn('Operación bloqueada: Alumno o Curso inactivo.');
+          return;
+      }
       setAnchorEl(event.currentTarget);
       setInscripcionSeleccionada(inscripcion);
   };
   const handleMenuClose = () => { setAnchorEl(null); };
   const handleEstadoUpdate = async (nuevoEstado: EstadoInscripcion) => {
       if (!inscripcionSeleccionada) return;
+
+      // AÑADIDO: Chequeo final de seguridad antes de la API
+      if (!inscripcionSeleccionada.alumno.activo || !inscripcionSeleccionada.curso.activo) {
+          alert('Error: No se puede cambiar el estado. El alumno o el curso están inactivos.');
+          handleMenuClose();
+          return;
+      }
+
       try {
           await apiClient.patch(`/inscripciones/${inscripcionSeleccionada.id}`, { estado: nuevoEstado });
           handleMenuClose();
@@ -166,7 +203,7 @@ export function ListaInscripciones({ inscripciones, loading, error, onEstadoCamb
       } catch (err) { console.error('Error al cambiar el estado:', err); }
   };
   const handleOpenModal = (inscripcion: IInscripcion) => { setInscripcionSeleccionada(inscripcion); setModalOpen(true); };
-  const handleCloseModal = () => { setModalOpen(false); setInscripcionSeleccionada(null); };
+  const handleCloseModal = () => { setModalOpen(false); setInscripcionSeleccionada(null); };
   const handleNotaRegistrada = () => { onEstadoCambiado?.(); };
   const handleToggleRow = (id: number) => { setOpenRowId(id === openRowId ? null : id); };
 

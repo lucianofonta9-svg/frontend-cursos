@@ -101,10 +101,11 @@ function AppLogicWrapper() {
         try {
             await apiClient.patch(`/alumnos/${legajo}/reactivate`);
             fetchAlumnos(); 
+            fetchInscripciones();
         } catch (err) {
             console.error('Error al reactivar alumno:', err);
         }
-    }, [fetchAlumnos]);
+    }, [fetchAlumnos, fetchInscripciones]);
 
     // --- Lógica de Cursos ---
     const handleDeactivateCurso = useCallback(async (id: number) => { 
@@ -122,11 +123,12 @@ function AppLogicWrapper() {
         if (!window.confirm(`¿Reactivar al curso ${id}?`)) return;
         try {
             await apiClient.patch(`/cursos/${id}/reactivate`);
-            fetchCursos(); 
+            fetchCursos();
+            fetchInscripciones();
         } catch (err) {
             console.error('Error al reactivar curso:', err);
         }
-    }, [fetchCursos]);
+    }, [fetchCursos, fetchInscripciones]);
 
     // --- CAMBIO 1: Función renombrada ---
     const handleRetirarInscripcion = useCallback(async (id: number) => {
