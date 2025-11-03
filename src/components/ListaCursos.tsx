@@ -15,19 +15,17 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete'; 
 import EditIcon from '@mui/icons-material/Edit';
-import RestoreIcon from '@mui/icons-material/Restore'; // <-- 1. IMPORTADO
+import RestoreIcon from '@mui/icons-material/Restore'; 
 
-// --- 2. INTERFAZ DE PROPS ACTUALIZADA ---
 interface ListaCursosProps {
   cursos: ICurso[];
   loading: boolean;
   error: string | null;
-  onDeactivate: (id: number) => void; // Prop renombrada
-  onEdit: (curso: ICurso) => void; // Cambiado a objeto completo por consistencia
-  onReactivate: (id: number) => void; // Prop nueva
+  onDeactivate: (id: number) => void; 
+  onEdit: (curso: ICurso) => void; 
+  onReactivate: (id: number) => void; 
 }
 
-// --- 3. PROPS DESTRUCTURADAS ACTUALIZADAS ---
 export function ListaCursos({ 
   cursos, 
   loading, 
@@ -47,13 +45,13 @@ export function ListaCursos({
 
   return (
     <TableContainer component={Paper} sx={{ marginTop: 4, marginBottom: 4 }}>
-      {/* 4. TEXTO ACTUALIZADO */}
+
       <Typography variant="h5" component="h2" sx={{ padding: 2 }}>
         Listado de Cursos
       </Typography>
 
       {cursos.length === 0 ? (
-        // 5. TEXTO ACTUALIZADO
+
         <Typography sx={{ padding: 2 }}>No hay cursos para mostrar.</Typography>
       ) : (
         <Table sx={{ minWidth: 650 }}>
@@ -69,20 +67,20 @@ export function ListaCursos({
           </TableHead>
           <TableBody>
             {cursos.map((curso) => (
-              // 6. ESTILO CONDICIONAL PARA LA FILA
+
               <TableRow 
                 key={curso.id}
-                sx={{ opacity: curso.activo ? 1 : 0.6 }} // <-- Más opaco si está inactivo
+                sx={{ opacity: curso.activo ? 1 : 0.6 }} 
               >
                 <TableCell>{curso.id}</TableCell>
                 <TableCell>{curso.nombre}</TableCell>
                 <TableCell>{curso.duracion}</TableCell>
                 <TableCell>
                   {curso.profesor ? (
-                    // Si el objeto Profesor existe (legajo NO es null)
+                  
                     `${curso.profesor.nombre} ${curso.profesor.apellido}`
                   ) : (
-                    // Si el objeto Profesor es null (legajo ES null)
+                   
                     <Chip label="Sin Asignar" size="small" variant="outlined" />
                   )}
                 </TableCell>
@@ -95,14 +93,14 @@ export function ListaCursos({
                   />
                 </TableCell>
                 
-                {/* 7. LÓGICA CONDICIONAL PARA BOTONES */}
+ 
                 <TableCell align="right">
                   {curso.activo ? (
                     <>
                       <IconButton
                         aria-label="edit"
                         color="primary"
-                        onClick={() => onEdit(curso)} // <-- Pasa el objeto completo
+                        onClick={() => onEdit(curso)} 
                         title="Editar"
                       >
                         <EditIcon />

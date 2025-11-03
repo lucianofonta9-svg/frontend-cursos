@@ -11,20 +11,18 @@ import {
   CircularProgress,
   Alert,
   IconButton,
-  Chip // <-- 1. IMPORTADO
+  Chip 
 } from '@mui/material';
 import DeleteIcon  from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import RestoreIcon from '@mui/icons-material/Restore'; // <-- 2. IMPORTADO (para reactivar)
+import RestoreIcon from '@mui/icons-material/Restore'; 
 
 interface ListaAlumnosProps {
   alumnos: IAlumno[];
   loading: boolean;
   error: string | null;
-  // 3. RENOMBRADO por claridad
   onDeactivate: (legajoAlumno: number) => void; 
   onEdit: (alumno: IAlumno) => void;
-  // 4. AÑADIDO para la nueva función
   onReactivate: (legajoAlumno: number) => void; 
 }
 
@@ -32,9 +30,9 @@ export function ListaAlumnos({
   alumnos, 
   loading, 
   error, 
-  onDeactivate, // <-- Prop actualizada
+  onDeactivate, 
   onEdit,
-  onReactivate  // <-- Prop nueva
+  onReactivate 
 }: ListaAlumnosProps) {
 
   if (loading) return <CircularProgress sx={{ margin: 'auto', display: 'block' }} />;
@@ -56,23 +54,22 @@ export function ListaAlumnos({
               <TableCell>Nombre Completo</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>DNI</TableCell>
-              {/* 5. NUEVA COLUMNA DE ESTADO */}
               <TableCell>Estado</TableCell>
               <TableCell align="right">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {alumnos.map((alu) => (
-              // 6. ESTILO CONDICIONAL PARA LA FILA
+
               <TableRow 
                 key={alu.legajoAlumno}
-                sx={{ opacity: alu.activo ? 1 : 0.6 }} // <-- Más opaco si está inactivo
+                sx={{ opacity: alu.activo ? 1 : 0.6 }} 
               >
                 <TableCell>{alu.legajoAlumno}</TableCell>
                 <TableCell>{alu.nombre} {alu.apellido}</TableCell>
                 <TableCell>{alu.email}</TableCell>
                 <TableCell>{alu.dni}</TableCell>
-                {/* 7. CELDA DE ESTADO CON CHIP */}
+ 
                 <TableCell>
                   <Chip 
                     label={alu.activo ? "Activo" : "Inactivo"}
@@ -82,10 +79,10 @@ export function ListaAlumnos({
                   />
                 </TableCell>
                 <TableCell align="right">
-                  {/* 8. LÓGICA CONDICIONAL PARA BOTONES */}
+
                   {alu.activo ? (
                     <>
-                      {/* Botón Editar (solo si está activo) */}
+   
                       <IconButton
                         color="primary"
                         onClick={() => onEdit(alu)}
@@ -93,7 +90,7 @@ export function ListaAlumnos({
                       >
                         <EditIcon />
                       </IconButton>
-                      {/* Botón Desactivar (antes 'onDelete') */}
+
                       <IconButton 
                         aria-label="deactivate" 
                         color="error"
@@ -105,10 +102,10 @@ export function ListaAlumnos({
                     </>
                   ) : (
                     <>
-                      {/* Botón Reactivar (solo si está inactivo) */}
+
                       <IconButton 
                         aria-label="reactivate" 
-                        color="success" // <-- Color verde
+                        color="success" 
                         onClick={() => onReactivate(alu.legajoAlumno)}
                         title="Reactivar"
                       >

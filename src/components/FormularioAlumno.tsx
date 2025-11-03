@@ -16,7 +16,7 @@ const initialState: ICreateAlumnoDto = {
 interface FormularioAlumnoProps {
   onAlumnoCreado: () => void;
   onRequestClose?: () => void;
-  alumnoToEdit?: IAlumno | null; // Nueva prop para editar
+  alumnoToEdit?: IAlumno | null; 
 }
 
 export function FormularioAlumno({ onAlumnoCreado, onRequestClose, alumnoToEdit }: FormularioAlumnoProps) {

@@ -25,7 +25,7 @@ interface FormularioCursoProps {
 
 export function FormularioCurso({ onCursoCreado, onRequestClose, cursoToEdit }: FormularioCursoProps) {
   const [formData, setFormData] = useState<ICreateCursoDto>(initialState);
-  const [profesores, setProfesores] = useState<IProfesor[]>([]); // <-- Guarda TODOS (activos e inactivos)
+  const [profesores, setProfesores] = useState<IProfesor[]>([]); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -43,11 +43,10 @@ export function FormularioCurso({ onCursoCreado, onRequestClose, cursoToEdit }: 
     }
   }, [cursoToEdit]);
 
-  // Cargar lista de profesores
+
   useEffect(() => {
     const fetchProfesores = async () => {
       try {
-        // (El backend ahora devuelve a todos, ordenados)
         const response = await apiClient.get<IProfesor[]>('/profesores');
         setProfesores(response.data);
       } catch (err: unknown) {
@@ -59,7 +58,6 @@ export function FormularioCurso({ onCursoCreado, onRequestClose, cursoToEdit }: 
     fetchProfesores();
   }, []);
 
-  // --- 1. FILTRADO DE LISTA ---
   // Creamos una lista derivada que solo contiene profesores activos.
   const profesoresActivos = profesores.filter(prof => prof.activo);
 
@@ -99,17 +97,16 @@ export function FormularioCurso({ onCursoCreado, onRequestClose, cursoToEdit }: 
       if (onRequestClose) onRequestClose();
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response) {
-        // --- 2. MANEJO DE ERROR CORREGIDO ---
         const data = err.response.data;
         if (err.response.status === 404) {
           setError('Profesor o curso no encontrado.');
         } else if (data && data.message) {
-          // Maneja tanto strings (nuestro error manual) como arrays (errores de DTO)
+          // Maneja tanto strings (error manual) como arrays (errores de DTO)
           const apiError = data.message;
           if (Array.isArray(apiError)) {
               setError(apiError.join(', '));
           } else {
-              setError(apiError); // <-- Asigna el string de error "Profesor inactivo..."
+              setError(apiError); // Asigna el string de error "Profesor inactivo"
           }
         } else {
           setError('Error al guardar el curso.');
@@ -153,7 +150,7 @@ export function FormularioCurso({ onCursoCreado, onRequestClose, cursoToEdit }: 
           fullWidth
         />
 
-        {/* --- 3. SELECT PROFESOR ACTUALIZADO --- */}
+        {/* --- 3. SELECT PROFESOR --- */}
         <FormControl fullWidth required disabled={profesoresActivos.length === 0}>
           <InputLabel>Asignar Profesor</InputLabel>
           <Select
@@ -162,14 +159,14 @@ export function FormularioCurso({ onCursoCreado, onRequestClose, cursoToEdit }: 
             value={formData.profesorLegajo || ''}
             onChange={handleSelectChange}
           >
-            {/* Mapea solo los profesores activos */}
+        {/* Mapea solo los profesores activos */}
             {profesoresActivos.map((prof) => (
               <MenuItem key={prof.legajoProfesor} value={prof.legajoProfesor}>
                 Legajo {prof.legajoProfesor} - {prof.nombre} {prof.apellido}
               </MenuItem>
             ))}
           </Select>
-        {/* Alerta de advertencia actualizada */}
+        {/* Alerta de advertencia */}
           {profesoresActivos.length === 0 && !loading && (
             <Alert severity="warning" sx={{mt: 1}}>
               No hay profesores activos para asignar.
@@ -185,7 +182,7 @@ export function FormularioCurso({ onCursoCreado, onRequestClose, cursoToEdit }: 
             type="submit" 
             variant="contained" 
             color="primary"
-            disabled={profesoresActivos.length === 0} // <-- Se deshabilita si no hay prof. activos
+            disabled={profesoresActivos.length === 0} // Se deshabilita si no hay prof. activos
           >
             {cursoToEdit ? 'Actualizar' : 'Guardar'}
           </Button>

@@ -24,8 +24,8 @@ interface GestionProfesoresViewProps {
   loading: boolean;
   error: string | null;
   onProfesorCreado: () => void;
-  onDeactivateProfesor: (legajo: number) => void; // Prop renombrada
-  onReactivateProfesor: (legajo: number) => void; // Prop nueva
+  onDeactivateProfesor: (legajo: number) => void; 
+  onReactivateProfesor: (legajo: number) => void; 
 }
 
 export const GestionProfesoresView = ({
@@ -40,7 +40,7 @@ export const GestionProfesoresView = ({
   const [open, setOpen] = useState(false);
   const [profesorEdit, setProfesorEdit] = useState<IProfesor | null>(null);
 
-  // 🔹 Estado para profesores filtrados
+  // Estado para profesores filtrados
   const [profesoresFiltrados, setProfesoresFiltrados] = useState<IProfesor[]>(profesores);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export const GestionProfesoresView = ({
         </Button>
       </Box>
 
-      {/* 🔹 Filtro de búsqueda */}
+      {/* Filtro de búsqueda */}
       <GenericSearchFilter
         data={profesores}
         keys={['nombre', 'apellido']}
@@ -89,14 +89,14 @@ export const GestionProfesoresView = ({
         placeholder="Buscar profesores..."
       />
 
-      {/* --- 3. ACTUALIZAR LAS PROPS PASADAS A LISTAPROFESORES --- */}
+
       <ListaProfesores
         profesores={profesoresFiltrados}
         loading={loading}
         error={error}
-        onDeactivate={onDeactivateProfesor} // Prop renombrada
+        onDeactivate={onDeactivateProfesor} 
         onEdit={handleOpenEditar} 
-        onReactivate={onReactivateProfesor} // Prop nueva
+        onReactivate={onReactivateProfesor} 
       />
 
       <Modal open={open} onClose={handleClose}>

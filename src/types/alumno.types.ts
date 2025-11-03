@@ -1,4 +1,4 @@
-// Para leer datos
+
 export interface IAlumno {
   legajoAlumno: number;
   nombre: string;
@@ -8,14 +8,13 @@ export interface IAlumno {
   email: string;
   telefono?: string;
   activo: boolean;
-  // inscripciones: any[]; // Omitimos por ahora
 }
 
-// Para crear datos (sin legajo ni activo)
+
 export interface ICreateAlumnoDto {
   nombre: string;
   apellido: string;
-  fechaNacimiento: string; // YYYY-MM-DD
+  fechaNacimiento: string; 
   dni: string;
   email: string;
   telefono?: string;

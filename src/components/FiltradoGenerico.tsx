@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 interface GenericSearchFilterProps<T> {
-  data: T[]; // lista de objetos a filtrar
-  keys: (keyof T)[]; // campos del objeto donde buscar
-  onFiltered: (filteredData: T[]) => void; // callback con datos filtrados
+  data: T[]; 
+  keys: (keyof T)[]; 
+  onFiltered: (filteredData: T[]) => void;
   placeholder?: string;
 }
 

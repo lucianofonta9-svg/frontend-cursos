@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../apiService';
 import { type IInscripcion } from '../types/inscripcion.types';
-import { type DashboardStats } from '../types/dashboard.types'; // Asume que 'dashboard.types.ts' existe
+import { type DashboardStats } from '../types/dashboard.types'; 
 import { 
     Box, Typography, Paper, 
     CircularProgress, Alert 
-} from '@mui/material'; // <-- ¡GRID YA NO SE IMPORTA AQUÍ!
+} from '@mui/material'; 
 import { 
   BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, 
   CartesianGrid, Tooltip, Legend, ResponsiveContainer 
@@ -18,7 +18,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import type { ICurso } from '../types/curso.types';
 import type { IProfesor } from '../types/profesor.types';
 import type { IAlumno } from '../types/alumno.types';
-// --- Componente de Tarjeta KPI (Helper) ---
+
 interface KpiCardProps {
   title: string;
   value: number | string;
@@ -35,7 +35,7 @@ function KpiCard({ title, value }: KpiCardProps) {
   );
 }
 
-// --- Corrección de tipo para PIE_COLORS ---
+
 const PIE_COLORS: { [key: string]: string } = {
   ACTIVO: '#1976d2',
   INSCRITO: '#9c27b0',
@@ -44,13 +44,13 @@ const PIE_COLORS: { [key: string]: string } = {
   DEFAULT: '#8884d8', 
 };
 
-// --- Props que recibe de App.tsx ---
+
 interface DashboardViewProps {
   inscripciones: IInscripcion[];
   loadingInscripciones: boolean;
   errorInscripciones: string | null;
-profesores: IProfesor[]; // <-- Estaba enviándola, faltaba aquí
-    alumnos: IAlumno[];     // <-- También la estabas enviando
+profesores: IProfesor[]; 
+    alumnos: IAlumno[];    
     cursos: ICurso[];
 
 
@@ -59,7 +59,7 @@ profesores: IProfesor[]; // <-- Estaba enviándola, faltaba aquí
   
 }
 
-// --- COMPONENTE PRINCIPAL ---
+
 export const DashboardView = ({
   inscripciones,
   loadingInscripciones,
@@ -102,90 +102,74 @@ export const DashboardView = ({
         <Alert severity="error">{errorStats}</Alert>
       ) : stats && (
         <>
-          {/* --- REEMPLAZO DE 'Grid container' POR 'Box con Flexbox' --- */}
-          {/* 'display="flex"' y 'flexWrap="wrap"' crean la rejilla.
-            'mx={-1.5}' y 'p={1.5}' en los hijos simulan el 'spacing={3}'
-          */}
-          {/* <Box display="flex" flexWrap="wrap" sx={{ mb: 4, mx: -1.5 }}>
-            
-            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
-              
-              <KpiCard title="Alumnos Activos" value={stats.kpis.totalAlumnosActivos} />
-            </Box>
-            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
-              <KpiCard title="Cursos Activos" value={stats.kpis.totalCursosActivos} />
-            </Box>
-            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
-              <KpiCard title="Profesores Activos" value={stats.kpis.totalProfesoresActivos} />
-            </Box>
-            <Box width={{ xs: 1, sm: 1/2, md: 1/4 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
-              <KpiCard title="Inscrip. Activas" value={stats.kpis.inscripcionesActivas} />
-            </Box>
-          </Box> */}
           <Box sx={{ mb: 4, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            flexGrow: 1,
-            minWidth: 200,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <PersonIcon color="primary" sx={{ fontSize: 40 }} />
-          <Typography variant="h6">Profesores Activos: {stats.kpis.totalProfesoresActivos}</Typography>
-        </Paper>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 2,
+                flexGrow: 1,
+                minWidth: 200,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              <PersonIcon color="primary" sx={{ fontSize: 40 }} />
+              <Typography variant="h6">Profesores Activos: {stats.kpis.totalProfesoresActivos}</Typography>
+            </Paper>
 
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            flexGrow: 1,
-            minWidth: 200,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <SchoolIcon color="secondary" sx={{ fontSize: 40 }} />
-          <Typography variant="h6">Cursos Activos: {stats.kpis.totalCursosActivos}</Typography>
-        </Paper>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 2,
+                flexGrow: 1,
+                minWidth: 200,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              <SchoolIcon color="secondary" sx={{ fontSize: 40 }} />
+              <Typography variant="h6">Cursos Activos: {stats.kpis.totalCursosActivos}</Typography>
+            </Paper>
 
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            flexGrow: 1,
-            minWidth: 200,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <PeopleIcon color="error" sx={{ fontSize: 40 }} />
-          <Typography variant="h6">Alumnos Activos: {stats.kpis.totalAlumnosActivos}</Typography>
-        </Paper>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 2,
+                flexGrow: 1,
+                minWidth: 200,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              <PeopleIcon color="error" sx={{ fontSize: 40 }} />
+              <Typography variant="h6">Alumnos Activos: {stats.kpis.totalAlumnosActivos}</Typography>
+            </Paper>
 
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            flexGrow: 1,
-            minWidth: 200,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <ArticleIcon color="success" sx={{ fontSize: 40 }} />
-          <Typography variant="h6">Inscrip. Activas: {stats.kpis.inscripcionesActivas}</Typography>
-        </Paper>
-      </Box>
-          {/* --- SECCIÓN DE GRÁFICOS (también reemplazada) --- */}
+            <Paper
+              elevation={3}
+              sx={{
+                p: 2,
+                flexGrow: 1,
+                minWidth: 200,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              <ArticleIcon color="success" sx={{ fontSize: 40 }} />
+              <Typography variant="h6">Inscrip. Activas: {stats.kpis.inscripcionesActivas}</Typography>
+            </Paper>
+          </Box>
+
+          {/* --- SECCIÓN DE GRÁFICOS --- */}
+
           <Box display="flex" flexWrap="wrap" sx={{ mb: 4, mx: -1.5 }}>
+
             {/* Box para el gráfico de barras */}
+
             <Box width={{ xs: 1, lg: 8/12 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
               <Paper sx={{ p: 2, height: { xs: 400, md: 500 } }}>
                 <Typography variant="h6" gutterBottom align="center">Alumnos por Curso (Top 10 Activos)</Typography>
@@ -203,6 +187,7 @@ export const DashboardView = ({
             </Box>
 
             {/* Box para el gráfico de torta */}
+            
             <Box width={{ xs: 1, lg: 4/12 }} sx={{ p: 1.5, boxSizing: 'border-box' }}>
               <Paper sx={{ p: 2, height: { xs: 400, md: 500 } }}>
                 <Typography variant="h6" gutterBottom align="center">Estado de Inscripciones</Typography>
@@ -231,7 +216,7 @@ export const DashboardView = ({
         </>
       )}
 
-      {/* --- SECCIÓN DE INSCRIPCIONES (Sin cambios) --- */}
+      {/* --- SECCIÓN DE INSCRIPCIONES */}
       <Typography variant="h5" component="h2" gutterBottom sx={{ mt: 4 }}>
         Últimas Inscripciones
       </Typography>
@@ -240,7 +225,7 @@ export const DashboardView = ({
         loading={loadingInscripciones}
         error={errorInscripciones}
         onEstadoCambiado={onEstadoCambiado}
-      onDeactivate={onDeleteInscripcion} // Redirige la prop
+      onDeactivate={onDeleteInscripcion} 
       />
     </Box>
   );

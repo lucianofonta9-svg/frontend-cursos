@@ -23,8 +23,8 @@ interface FormularioInscripcionProps {
 
 export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: FormularioInscripcionProps) {
   const [formData, setFormData] = useState<ICreateInscripcionDto>(initialState);
-  const [alumnos, setAlumnos] = useState<IAlumno[]>([]); // <-- Guarda TODOS (activos e inactivos)
-  const [cursos, setCursos] = useState<ICurso[]>([]);   // <-- Guarda TODOS (activos e inactivos)
+  const [alumnos, setAlumnos] = useState<IAlumno[]>([]); 
+  const [cursos, setCursos] = useState<ICurso[]>([]);   
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
     const fetchSelectData = async () => {
       try {
         setLoading(true);
-        // (El backend ahora devuelve a todos, ordenados)
+
         const [alumnosRes, cursosRes] = await Promise.all([
           apiClient.get<IAlumno[]>('/alumnos'),
           apiClient.get<ICurso[]>('/cursos'),
@@ -41,7 +41,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
         setAlumnos(alumnosRes.data);
         setCursos(cursosRes.data);
       } catch (err: unknown) {
-        setError('Error cargando listas para inscripción.'); // Mensaje simplificado
+        setError('Error cargando listas para inscripción.'); 
         console.error(err);
       } finally {
         setLoading(false);
@@ -50,7 +50,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
     fetchSelectData();
   }, []);
 
-  // --- 1. FILTRADO DE LISTAS ---
+
   // Creamos listas derivadas que solo contienen entidades activas.
   // Estas se usarán para poblar los menús <Select>.
   const alumnosActivos = alumnos.filter(alu => alu.activo);
@@ -93,15 +93,14 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
         } else if (status === 409) {
           setError('Conflicto: El alumno ya está inscrito en este curso.');
         
-        // --- 2. MANEJO DE ERROR CORREGIDO ---
+ 
         } else if (data && data.message) {
-          // El 'message' del backend puede ser un string (nuestro error manual de "inactivo")
-          // o un array de strings (errores de DTO/class-validator).
+
           const apiError = data.message;
           if (Array.isArray(apiError)) {
               setError(apiError.join(', '));
           } else {
-              setError(apiError); // <-- Asigna el string de error directamente
+              setError(apiError); 
           }
         } else {
           setError(`Error de servidor al inscribir: ${status}.`);
@@ -124,7 +123,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
       >
         <Typography variant="h5">Inscribir Alumno a Curso</Typography>
 
-        {/* --- 3. SELECT ALUMNO ACTUALIZADO --- */}
+        {/* 3. SELECT ALUMNO  */}
         <FormControl fullWidth required>
           <InputLabel>Seleccionar Alumno</InputLabel>
           <Select
@@ -132,7 +131,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
             name="alumnoLegajo"
             value={formData.alumnoLegajo || ''}
             onChange={handleChange}
-            disabled={alumnosActivos.length === 0} // <-- Usa la lista filtrada
+            disabled={alumnosActivos.length === 0} 
           >
           {/* Mapea solo los alumnos activos */}
             {alumnosActivos.map((alu) => (
@@ -146,7 +145,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
         )}
         </FormControl>
 
-        {/* --- 4. SELECT CURSO ACTUALIZADO --- */}
+        {/* --- 4. SELECT CURSO --- */}
         <FormControl fullWidth required>
           <InputLabel>Seleccionar Curso</InputLabel>
           <Select
@@ -154,7 +153,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
             name="cursoId"
             value={formData.cursoId || ''}
             onChange={handleChange}
-            disabled={cursosActivos.length === 0} // <-- Usa la lista filtrada
+            disabled={cursosActivos.length === 0}
           >
           {/* Mapea solo los cursos activos */}
             {cursosActivos.map((cur) => (
@@ -174,7 +173,7 @@ export function FormularioInscripcion({ onInscripcionCreada, onRequestClose }: F
             type="submit" 
             variant="contained" 
             color="secondary" 
-            disabled={alumnosActivos.length === 0 || cursosActivos.length === 0} // <-- Usa listas filtradas
+            disabled={alumnosActivos.length === 0 || cursosActivos.length === 0} 
           >
               Inscribir
           </Button>

@@ -72,7 +72,7 @@ function AppLogicWrapper() {
         } catch (err) { 
             console.error('Error al dar de baja al profesor:', err); 
         } 
-    }, [fetchProfesores, fetchCursos]); // <-- Dependencia añadida
+    }, [fetchProfesores, fetchCursos]); 
 
     const handleReactivateProfesor = useCallback(async (legajo: number) => {
         if (!window.confirm(`¿Reactivar al profesor ${legajo}?`)) return;
@@ -94,7 +94,7 @@ function AppLogicWrapper() {
         } catch (err) { 
             console.error('Error al dar de baja al alumno:', err); 
         } 
-    }, [fetchAlumnos, fetchInscripciones]); // <-- Dependencia añadida
+    }, [fetchAlumnos, fetchInscripciones]); 
 
     const handleReactivateAlumno = useCallback(async (legajo: number) => {
         if (!window.confirm(`¿Reactivar al alumno ${legajo}?`)) return;
@@ -117,7 +117,7 @@ function AppLogicWrapper() {
         } catch (err) { 
             console.error('Error al dar de baja al curso:', err); 
         } 
-    }, [fetchCursos, fetchInscripciones]); // <-- Dependencia añadida
+    }, [fetchCursos, fetchInscripciones]); 
 
     const handleReactivateCurso = useCallback(async (id: number) => {
         if (!window.confirm(`¿Reactivar al curso ${id}?`)) return;

@@ -18,14 +18,14 @@ const modalStyle = {
   borderRadius: 1,
 };
 
-// --- CAMBIO 1: Se actualiza la interfaz de Props ---
+
 interface GestionAlumnosViewProps {
   alumnos: IAlumno[];
   loading: boolean;
   error: string | null;
   onAlumnoCreado: () => void;
-  onDeactivateAlumno: (legajo: number) => void; // Prop renombrada
-  onReactivateAlumno: (legajo: number) => void; // Prop nueva
+  onDeactivateAlumno: (legajo: number) => void; 
+  onReactivateAlumno: (legajo: number) => void; 
 }
 
 export const GestionAlumnosView = ({
@@ -33,17 +33,16 @@ export const GestionAlumnosView = ({
   loading,
   error,
   onAlumnoCreado,
-  // --- CAMBIO 2: Se desestructuran las props actualizadas ---
   onDeactivateAlumno,
   onReactivateAlumno,
 }: GestionAlumnosViewProps) => {
   const [open, setOpen] = useState(false);
   const [alumnoEdit, setAlumnoEdit] = useState<IAlumno | null>(null);
 
-  // 🔹 Estado para alumnos filtrados
+
   const [alumnosFiltrados, setAlumnosFiltrados] = useState<IAlumno[]>(alumnos);
 
-  // 🔹 Actualizar filtrados si cambia la lista original
+
   useEffect(() => {
     setAlumnosFiltrados(alumnos);
   }, [alumnos]);
@@ -77,7 +76,7 @@ export const GestionAlumnosView = ({
         </Button>
       </Box>
 
-      {/* 🔹 Componente de búsqueda genérico */}
+
       <GenericSearchFilter
         data={alumnos}
         keys={['nombre', 'apellido']}
@@ -85,14 +84,14 @@ export const GestionAlumnosView = ({
         placeholder="Buscar alumnos..."
       />
 
-      {/* --- CAMBIO 3: Se actualizan las props pasadas a ListaAlumnos --- */}
+
       <ListaAlumnos
         alumnos={alumnosFiltrados}
         loading={loading}
         error={error}
-        onDeactivate={onDeactivateAlumno} // Prop renombrada
+        onDeactivate={onDeactivateAlumno} 
         onEdit={handleOpenEditar}
-        onReactivate={onReactivateAlumno} // Prop nueva
+        onReactivate={onReactivateAlumno}
       />
 
       {/* Modal para crear/editar alumno */}

@@ -11,27 +11,26 @@ import {
   CircularProgress,
   Alert,
   IconButton,
-  Chip // <-- 1. IMPORTADO
+  Chip 
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import RestoreIcon from '@mui/icons-material/Restore'; // <-- 2. IMPORTADO
+import RestoreIcon from '@mui/icons-material/Restore'; 
 
-// --- 3. INTERFAZ DE PROPS ACTUALIZADA ---
+
 interface ListaProfesoresProps {
   profesores: IProfesor[];
   loading: boolean;
   error: string | null;
-  onDeactivate: (legajoProfesor: number) => void; // Prop renombrada
+  onDeactivate: (legajoProfesor: number) => void; 
   onEdit: (profesor: IProfesor) => void;
-  onReactivate: (legajoProfesor: number) => void; // Prop nueva
+  onReactivate: (legajoProfesor: number) => void; 
 }
 
 export function ListaProfesores({
   profesores,
   loading,
   error,
-  // --- 4. PROPS DESTRUCTURADAS ACTUALIZADAS ---
   onDeactivate,
   onEdit,
   onReactivate,
@@ -53,7 +52,6 @@ export function ListaProfesores({
 
       {profesores.length === 0 ? (
         <Typography sx={{ padding: 2 }}>
-          {/* 5. TEXTO ACTUALIZADO */}
           No hay profesores para mostrar.
         </Typography>
       ) : (
@@ -64,17 +62,15 @@ export function ListaProfesores({
               <TableCell>Nombre Completo</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>DNI</TableCell>
-              {/* 6. NUEVA COLUMNA DE ESTADO */}
               <TableCell>Estado</TableCell>
               <TableCell align="right">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {profesores.map((prof) => (
-              // 7. ESTILO CONDICIONAL PARA LA FILA
               <TableRow 
                 key={prof.legajoProfesor}
-                sx={{ opacity: prof.activo ? 1 : 0.6 }} // <-- Más opaco si está inactivo
+                sx={{ opacity: prof.activo ? 1 : 0.6 }} 
               >
                 <TableCell>{prof.legajoProfesor}</TableCell>
                 <TableCell>
@@ -83,7 +79,6 @@ export function ListaProfesores({
                 <TableCell>{prof.email}</TableCell>
                 <TableCell>{prof.dni}</TableCell>
 
-                {/* 8. CELDA DE ESTADO CON CHIP */}
                 <TableCell>
                   <Chip 
                     label={prof.activo ? "Activo" : "Inactivo"}
@@ -93,7 +88,6 @@ export function ListaProfesores({
                   />
                 </TableCell>
 
-                {/* 9. LÓGICA CONDICIONAL PARA BOTONES */}
                 <TableCell align="right">
                   {prof.activo ? (
                     <>

@@ -51,30 +51,30 @@ export function FormularioProfesor({ onProfesorCreado, onRequestClose, profesorT
     setSuccess(null);
 
     try {
-      if (profesorToEdit) {
-        // Editar profesor existente
-        const response = await apiClient.patch(`/profesores/${profesorToEdit.legajoProfesor}`, formData);
-        setSuccess(`Profesor "${response.data.nombre}" actualizado correctamente.`);
-      } else {
-        // Crear nuevo profesor
-        const response = await apiClient.post('/profesores', formData);
-        setSuccess(`Profesor "${response.data.nombre}" creado con legajo ${response.data.legajoProfesor}.`);
-      }
+          if (profesorToEdit) {
+            // Editar profesor si existe
+            const response = await apiClient.patch(`/profesores/${profesorToEdit.legajoProfesor}`, formData);
+            setSuccess(`Profesor "${response.data.nombre}" actualizado correctamente.`);
+          } else {
+            // Crear nuevo profesor si no existe
+            const response = await apiClient.post('/profesores', formData);
+            setSuccess(`Profesor "${response.data.nombre}" creado con legajo ${response.data.legajoProfesor}.`);
+          }
 
-      onProfesorCreado();
-      if (onRequestClose) onRequestClose();
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response) {
-        if (err.response.status === 400) {
-          const apiErrors = err.response.data.message as string[];
-          setError(apiErrors.join(', '));
-        } else {
-          setError(`Error: ${err.response.status} ${err.response.statusText}`);
-        }
-      } else {
-        setError('Error al procesar el formulario. Revise la consola.');
-      }
-      console.error(err);
+          onProfesorCreado();
+          if (onRequestClose) onRequestClose();
+        } catch (err: unknown) {
+          if (axios.isAxiosError(err) && err.response) {
+            if (err.response.status === 400) {
+              const apiErrors = err.response.data.message as string[];
+              setError(apiErrors.join(', '));
+            } else {
+              setError(`Error: ${err.response.status} ${err.response.statusText}`);
+            }
+          } else {
+            setError('Error al procesar el formulario. Revise la consola.');
+          }
+          console.error(err);
     }
   };
 

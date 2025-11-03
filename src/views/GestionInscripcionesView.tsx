@@ -23,7 +23,7 @@ export const GestionInscripcionesView = ({
   error,
   onInscripcionCreada,
   onEstadoCambiado,
-  onDeleteInscripcion, // (Recibe la prop de App.tsx)
+  onDeleteInscripcion, 
   keyInscripcionForm,
 }: {
   inscripciones: any[];
@@ -56,8 +56,7 @@ export const GestionInscripcionesView = ({
         </Button>
       </Box>
 
-      {/* --- ¡CAMBIO AQUÍ! --- */}
-      {/* (Se cambió 'onDelete' por 'onDeactivate' para que coincida con ListaInscripciones) */}
+
       <ListaInscripciones
         inscripciones={inscripciones}
         loading={loading}

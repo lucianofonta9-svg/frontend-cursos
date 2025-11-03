@@ -1,4 +1,4 @@
-// En: src/types/dashboard.types.ts
+
 
 interface GraficoDataPoint {
   name: string;

@@ -18,8 +18,7 @@ const modalStyle = {
   width: 500,
 };
 
-// --- 1. PROPS ACTUALIZADAS ---
-// (Renombrado 'onDeleteCurso' y añadido 'onReactivateCurso')
+
 export const GestionCursosView = ({
   cursos,
   loading,
@@ -38,7 +37,7 @@ export const GestionCursosView = ({
   const [open, setOpen] = useState(false);
   const [cursoEdit, setCursoEdit] = useState<ICurso | null>(null);
 
-  // 🔹 Estado para cursos filtrados
+  // Estado para cursos filtrados
   const [cursosFiltrados, setCursosFiltrados] = useState<ICurso[]>(cursos);
 
   useEffect(() => {
@@ -55,8 +54,7 @@ export const GestionCursosView = ({
     setOpen(true);
   };
 
-  // --- 2. LÓGICA DE handleOpenEditar ACTUALIZADA ---
-  // (Ahora recibe el objeto 'curso' completo desde ListaCursos)
+
   const handleOpenEditar = (curso: ICurso) => {
     setCursoEdit(curso);
     setOpen(true);
@@ -81,7 +79,7 @@ export const GestionCursosView = ({
         </Button>
       </Box>
 
-      {/* 🔹 Filtro de búsqueda */}
+      {/* Filtro de búsqueda */}
       <GenericSearchFilter
         data={cursos}
         keys={['nombre', 'descripcion']}
@@ -89,14 +87,14 @@ export const GestionCursosView = ({
         placeholder="Buscar cursos..."
       />
 
-      {/* --- 3. PROPS PASADAS A ListaCursos ACTUALIZADAS --- */}
+
       <ListaCursos
         cursos={cursosFiltrados}
         loading={loading}
         error={error}
-        onDeactivate={onDeactivateCurso} // Renombrada
-        onEdit={handleOpenEditar}       // Actualizada
-        onReactivate={onReactivateCurso} // Nueva
+        onDeactivate={onDeactivateCurso} 
+        onEdit={handleOpenEditar}       
+        onReactivate={onReactivateCurso} 
       />
 
       <Modal open={open} onClose={handleClose}>

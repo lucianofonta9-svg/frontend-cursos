@@ -8,7 +8,7 @@ import {
   Box, Button, TextField, Typography, Alert, Modal,
 } from '@mui/material';
 
-// Estilo simple para centrar el modal
+// Estilo para el modal
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
@@ -22,9 +22,9 @@ const style = {
 };
 
 interface FormularioNotaModalProps {
-  inscripcion: IInscripcion | null; // La inscripción a la que se asignará la nota
+  inscripcion: IInscripcion | null; 
   open: boolean;
-  onClose: () => void; // Función para cerrar el modal
+  onClose: () => void; 
   onNotaRegistrada: () => void; // Función para avisar al padre que recargue
 }
 
@@ -50,10 +50,10 @@ export function FormularioNotaModal({ inscripcion, open, onClose, onNotaRegistra
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Aseguramos que la calificación se guarde como número
+    // la calificación se guarda como número
     let processedValue: string | number = value;
     if (name === 'calificacion') {
-        // Usamos parseFloat para manejar el valor del input number con decimales
+        // parseFloat para manejar el valor del input number con decimales
         processedValue = parseFloat(value);
     }
     
@@ -82,18 +82,18 @@ export function FormularioNotaModal({ inscripcion, open, onClose, onNotaRegistra
     // El DTO completo que se envía
     const dtoCompleto: ICreateNotaDto = {
         ...formData,
-        inscripcionId: inscripcion.id, // Añadimos la clave foránea aquí
+        inscripcionId: inscripcion.id, // Añadimos la clave foránea 
     };
     
     try {
       await apiClient.post('/notas', dtoCompleto);
       setSuccess(`Nota ${formData.calificacion.toFixed(2)} registrada con éxito.`);
       
-      // Tras un breve tiempo, cerramos y recargamos
+      //  cerramos y recargamos
       setTimeout(() => {
         handleModalClose();
         onNotaRegistrada(); 
-      }, 1500);
+      }, 1); //el uno es una unidad de tiempo 
 
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response) {
@@ -137,13 +137,12 @@ export function FormularioNotaModal({ inscripcion, open, onClose, onNotaRegistra
           label="Calificación (0.00 a 10.00)"
           name="calificacion"
           type="number"
-          // CORRECCIÓN CLAVE: Pasamos step al objeto inputProps
           inputProps={{ 
               min: 0, 
               max: 10, 
-              step: "0.01" // AHORA ESTÁ ANIDADO
+              step: "0.01" 
           }}
-          value={formData.calificacion === 0 ? '' : formData.calificacion} // Usamos '' para que el 0 inicial no se muestre
+          value={formData.calificacion === 0 ? '' : formData.calificacion} 
           onChange={handleChange}
           fullWidth
           required
